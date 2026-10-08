@@ -3,65 +3,224 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>민첩한 하루 되세요 · 포도알 잡기 티켓팅 게임</title>
+  <title>MOL 티켓 · 민첩한 하루 되세요</title>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
-      margin: 0; 
       min-height: 100vh; 
-      display: grid; 
-      place-items: center; 
-      padding: 24px; 
-      background: #eef1eb; 
-      color: #17241c; 
-      font-family: system-ui, "Malgun Gothic", sans-serif; 
+      background: #f8f9fa; 
+      color: #1e1b2e; 
+      font-family: system-ui, "Malgun Gothic", -apple-system, sans-serif; 
     }
+
+    /* 상단 헤더 & 검색바 (MOL 티켓 스타일) */
+    header {
+      background: white;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-top {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 26px;
+      font-weight: 900;
+      color: #6b21a8;
+      letter-spacing: -1px;
+      text-decoration: none;
+    }
+    .search-bar {
+      position: relative;
+      width: 320px;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 10px 16px;
+      padding-right: 40px;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      background: #f9fafb;
+      font-size: 13px;
+      outline: none;
+    }
+    .search-bar input:focus {
+      border-color: #6b21a8;
+      background: white;
+    }
+    .search-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b21a8;
+      font-size: 14px;
+    }
+    .user-menu {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #4b5563;
+    }
+    .user-menu span { cursor: pointer; }
+
+    /* 내비게이션 탭 */
+    .nav-bar {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      gap: 24px;
+      font-size: 15px;
+      font-weight: 700;
+      border-top: 1px solid #f3f4f6;
+    }
+    .nav-item {
+      padding: 12px 0;
+      color: #374151;
+      cursor: pointer;
+      position: relative;
+    }
+    .nav-item.active {
+      color: #6b21a8;
+    }
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #6b21a8;
+    }
+
+    /* 메인 콘텐츠 영역 */
+    .container {
+      max-width: 1080px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+
+    /* 콘서트 메인 배너 카드 */
+    .hero-banner {
+      background: linear-gradient(135deg, #2e1065 0%, #6b21a8 100%);
+      border-radius: 16px;
+      padding: 32px;
+      color: white;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(107, 33, 168, 0.2);
+    }
+    .hero-text .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+    .hero-text h2 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .hero-text p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    /* 카테고리 아이콘 바 */
+    .category-bar {
+      display: flex;
+      justify-content: space-between;
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .cat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #4b5563;
+      cursor: pointer;
+    }
+    .cat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f3ebfc;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+
+    /* 게임 플레이 메인 카드 */
     main { 
-      width: min(100%, 720px); 
-      padding: clamp(20px, 4vw, 36px); 
-      border: 1px solid #00462a; 
-      border-radius: 8px; 
       background: white; 
+      border: 1px solid #e5e7eb; 
+      border-radius: 12px; 
+      padding: 28px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
-    .label { margin: 0 0 12px; color: #00462a; font-size: 14px; font-weight: 700; }
-    h1 { margin: 0 0 12px; font-size: clamp(24px, 5vw, 36px); }
-    p { line-height: 1.6; margin: 0 0 16px; }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .game-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #581c87;
+    }
 
     /* 게임 상단 정보 바 */
     .game-status-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #f3f5f1;
+      background: #f3ebfc;
       padding: 12px 16px;
-      border: 1px solid #d8ded7;
-      border-radius: 4px;
+      border: 1px solid #e9d5ff;
+      border-radius: 6px;
       margin-bottom: 16px;
       font-weight: bold;
     }
-    .stage-name { color: #00462a; font-size: 16px; }
-    .timer { color: #d9534f; font-size: 18px; }
+    .stage-name { color: #581c87; font-size: 15px; }
+    .timer { color: #dc2626; font-size: 16px; }
 
-    /* 게임 스테이지 관람석 (포도알 구역) */
+    /* 게임 스테이지 관람석 구역 */
     #stage { 
       position: relative;
       display: grid; 
-      gap: 5px;
-      min-height: 350px; 
+      gap: 1px;
+      min-height: 420px; 
       margin: 0 0 20px; 
-      padding: 16px; 
-      background: #1e1e1e; 
-      border: 2px solid #00462a; 
-      border-radius: 6px;
+      padding: 8px; 
+      background: #0a0a0a; 
+      border: 2px solid #6b21a8; 
+      border-radius: 8px;
       overflow: hidden;
       user-select: none;
     }
 
-    /* 대기/완료 화면 안내 문구 */
+    /* 오버레이 공통 */
     .stage-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.96);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -70,30 +229,150 @@
       text-align: center;
       z-index: 10;
     }
-    .stage-overlay h2 { margin: 0 0 12px; color: #00462a; }
+    .stage-overlay h2 { margin: 0 0 12px; color: #6b21a8; }
 
-    /* 좌석(포도알) 기본 스타일 */
-    .seat {
-      border-radius: 3px;
+    /* 광고 팝업 전용 스타일 */
+    .ad-card {
+      position: relative;
+      background: white;
+      border: 2px solid #6b21a8;
+      border-radius: 12px;
+      padding: 12px;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .ad-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      object-fit: contain;
+      max-height: 320px;
+    }
+    .ad-close-btn {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 32px;
+      height: 32px;
+      background: #dc2626 !important;
+      color: white !important;
+      border: 2px solid white !important;
+      border-radius: 50% !important;
+      font-size: 16px !important;
+      font-weight: 900 !important;
+      padding: 0 !important;
       cursor: pointer;
-      transition: background-color 0.05s, transform 0.05s;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .ad-close-btn:hover {
+      background: #991b1b !important;
     }
 
-    /* 포도알 (보라색 선택 가능 좌석) */
+    /* 결제 모달 팝업 창 */
+    .payment-card {
+      background: white;
+      border: 2px solid #6b21a8;
+      border-radius: 8px;
+      padding: 20px;
+      width: min(90%, 380px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: left;
+    }
+    .payment-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #f3ebfc;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+    }
+    .payment-card h3 {
+      margin: 0;
+      color: #581c87;
+      font-size: 17px;
+    }
+    .pay-timer {
+      color: #dc2626;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    /* 결제 수단 버튼 형태 그리드 */
+    .payment-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .pay-method-btn {
+      padding: 10px 12px !important;
+      border: 1px solid #d1d5db !important;
+      border-radius: 6px !important;
+      background: #f9fafb !important;
+      color: #374151 !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pay-method-btn:hover:not(:disabled) {
+      border-color: #6b21a8 !important;
+      background: #f3ebfc !important;
+      color: #6b21a8 !important;
+    }
+    .pay-method-btn.selected {
+      border-color: #6b21a8 !important;
+      background: #6b21a8 !important;
+      color: white !important;
+      box-shadow: 0 2px 6px rgba(107, 33, 168, 0.3);
+    }
+    .pay-method-btn:disabled {
+      opacity: 0.35 !important;
+      background: #e5e7eb !important;
+      border-color: #e5e7eb !important;
+      color: #9ca3af !important;
+      cursor: not-allowed !important;
+      text-decoration: line-through;
+    }
+
+    .payment-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .payment-actions button {
+      padding: 6px 14px !important;
+      font-size: 12px !important;
+    }
+    .btn-cancel {
+      background: #f3f4f6 !important;
+      color: #374151 !important;
+      border: 1px solid #d1d5db !important;
+    }
+    .btn-cancel:hover {
+      background: #e5e7eb !important;
+    }
+
+    /* 극초소형 좌석(포도알) 스타일 */
+    .seat {
+      border-radius: 0px;
+      cursor: pointer;
+    }
     .seat.grape {
       background: #8a2be2;
-      box-shadow: 0 0 5px #a855f7;
     }
     .seat.grape:hover {
-      transform: scale(1.1);
-      background: #9d4edd;
+      background: #c084fc;
     }
-
-    /* 팔린 좌석 (검은색 선택 불가) */
     .seat.taken {
-      background: #2b2b2b;
+      background: #1a1a1a;
       cursor: not-allowed;
-      box-shadow: none;
     }
 
     /* 이선좌 팝업 경고 */
@@ -104,100 +383,204 @@
       transform: translate(-50%, -50%);
       background: #ff4d4d;
       color: white;
-      padding: 12px 20px;
+      padding: 10px 16px;
       border-radius: 6px;
+      font-size: 14px;
       font-weight: bold;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 20;
+      z-index: 25;
       display: none;
     }
 
-    .buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; }
     button { 
-      padding: 12px 20px; 
-      border: 1px solid #00462a; 
+      padding: 10px 18px; 
+      border: 1px solid #6b21a8; 
       border-radius: 4px; 
-      background: #00462a; 
+      background: #6b21a8; 
       color: white; 
       font: inherit; 
+      font-size: 14px;
       font-weight: bold;
       cursor: pointer; 
     }
-    #restart { background: white; color: #00462a; }
+    button:hover { background: #581c87; }
+    #restart { background: white; color: #6b21a8; }
+    #restart:hover { background: #f3ebfc; }
     button:disabled { opacity: .4; cursor: default; }
-    button:focus-visible { outline: 3px solid #69a58c; outline-offset: 4px; }
 
-    .note { margin-top: 24px; padding-top: 16px; border-top: 1px solid #d8ded7; color: #68746b; font-size: 14px; }
+    footer {
+      max-width: 1080px;
+      margin: 40px auto 20px;
+      padding: 0 24px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
-  <main>
-    <p class="label">민첩한 하루 되세요 · 웹게임 프로젝트</p>
-    <h1>🍇 아이돌 콘서트 포도알 잡기</h1>
-    <p>시작 즉시 모든 좌석이 풀립니다! 사라지기 전 보라색 포도알 하나를 민첩하게 누르세요!</p>
 
-    <!-- 게임 상단 상태 표시 바 -->
-    <div class="game-status-bar">
-      <span id="stage-label" class="stage-name">대기 중</span>
-      <span id="timer-label" class="timer">남은 포도알: --개</span>
-    </div>
-
-    <!-- 게임 스테이지 영역 -->
-    <section id="stage" aria-label="티켓팅 좌석 선택 화면" aria-live="polite">
-      <div id="pop-alert" class="pop-alert">이미 선택된 좌석입니다! (이선좌)</div>
-      
-      <!-- 오버레이 안내창 -->
-      <div id="overlay" class="stage-overlay">
-        <h2 id="overlay-title">민첩함 검증 준비</h2>
-        <p id="overlay-desc">시작 버튼을 눌러 1단계 'NUGU 그룹 팬미팅' 티켓팅을 시작하세요.</p>
+  <!-- MOL 티켓 상단 헤더 -->
+  <header>
+    <div class="header-top">
+      <a href="#" class="logo">MOL</a>
+      <div class="search-bar">
+        <input type="text" value="민첩한 하루 되세요" readonly>
+        <span class="search-icon">🔍</span>
       </div>
-    </section>
+      <div class="user-menu">
+        <span>👤 마이</span>
+        <span>♡ 찜</span>
+        <span>🛒 장바구니</span>
+      </div>
+    </div>
+    <nav class="nav-bar">
+      <div class="nav-item">전체 카테고리</div>
+      <div class="nav-item">홈</div>
+      <div class="nav-item active">티켓</div>
+      <div class="nav-item">특가</div>
+      <div class="nav-item">쿠폰·혜택</div>
+    </nav>
+  </header>
 
-    <div class="buttons">
-      <button id="start" type="button">티켓팅 시작</button>
-      <button id="restart" type="button" disabled>처음부터 다시</button>
+  <div class="container">
+    <!-- 메인 라이브 콘서트 배너 -->
+    <div class="hero-banner">
+      <div class="hero-text">
+        <span class="badge">2026 단독 티켓팅</span>
+        <h2>🍇 민첩성 검증 콘서트 LIVE</h2>
+        <p>순발력 단 0.001초의 승부! 방해요소를 뚫고 포도알을 선점하세요.</p>
+      </div>
     </div>
 
-    <p class="note">경고: 5단계 '슈퍼월드스타 콘서트'까지 민첩함을 유지해야 완료할 수 있습니다!</p>
-  </main>
+    <!-- 카테고리 아이콘 레퍼런스 -->
+    <div class="category-bar">
+      <div class="cat-item"><div class="cat-icon">🎭</div>뮤지컬</div>
+      <div class="cat-item"><div class="cat-icon">🎤</div>콘서트</div>
+      <div class="cat-item"><div class="cat-icon">⚾</div>스포츠</div>
+      <div class="cat-item"><div class="cat-icon">🖼️</div>전시/행사</div>
+      <div class="cat-item"><div class="cat-icon">🎹</div>클래식</div>
+      <div class="cat-item"><div class="cat-icon">🎪</div>연극</div>
+    </div>
+
+    <!-- 핵심 게임 영역 -->
+    <main>
+      <div class="game-header">
+        <div class="game-title">🍇 아이돌 콘서트 좌석 예매 (포도알 잡기)</div>
+      </div>
+      <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">
+        사라지기 전 극소형 포도알을 누르고, 난립하는 방해 요소와 3초 제한 결제를 뚫어내세요!
+      </p>
+
+      <!-- 게임 상단 상태 표시 바 -->
+      <div class="game-status-bar">
+        <span id="stage-label" class="stage-name">대기 중</span>
+        <span id="timer-label" class="timer">남은 포도알: --개</span>
+      </div>
+
+      <!-- 게임 스테이지 영역 -->
+      <section id="stage" aria-label="티켓팅 좌석 선택 화면" aria-live="polite">
+        <div id="pop-alert" class="pop-alert">이미 선택된 좌석입니다! (이선좌)</div>
+        
+        <!-- 오버레이 안내창 -->
+        <div id="overlay" class="stage-overlay">
+          <h2 id="overlay-title">민첩함 검증 준비</h2>
+          <p id="overlay-desc" style="color: #4b5563; font-size: 14px;">시작 버튼을 눌러 1단계 'NUGU 그룹 팬미팅' 티켓팅을 시작하세요.</p>
+        </div>
+
+        <!-- 방해 광고 팝업 모달 -->
+        <div id="ad-overlay" class="stage-overlay" style="display: none; z-index: 15;">
+          <div class="ad-card">
+            <button id="ad-close-btn" class="ad-close-btn" type="button">✕</button>
+            <img src="image_b689bc.jpg" alt="해커톤 모집 광고">
+            <p style="font-size: 12px; color: #dc2626; font-weight: bold; margin-top: 8px;">
+              ⚠️ 기습 광고 발생! 닫기 버튼을 민첩하게 누르세요!
+            </p>
+          </div>
+        </div>
+
+        <!-- 결제창 모달 팝업 -->
+        <div id="payment-overlay" class="stage-overlay" style="display: none; z-index: 20;">
+          <div class="payment-card">
+            <div class="payment-card-header">
+              <h3>💳 티켓 결제하기</h3>
+              <span id="pay-timer-text" class="pay-timer">⏳ 3.0초</span>
+            </div>
+            <p style="font-size: 13px; margin-bottom: 12px; color: #4b5563;">
+              가능한 결제 수단을 선택하고 확인을 누르세요.
+            </p>
+            
+            <div class="payment-btn-grid">
+              <button type="button" class="pay-method-btn" data-method="card">신용/체크카드</button>
+              <button type="button" class="pay-method-btn" data-method="vbank">무통장입금</button>
+              <button type="button" class="pay-method-btn" data-method="kakaopay">카카오페이</button>
+              <button type="button" class="pay-method-btn" data-method="naverpay">네이버페이</button>
+            </div>
+
+            <!-- 스테이지별로 순서가 위치가 바뀌는 결제 버튼 영역 -->
+            <div id="payment-actions" class="payment-actions">
+              <!-- JS에서 버튼 위치를 무작위로 교체 생성 -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="buttons">
+        <button id="start" type="button">티켓팅 시작</button>
+        <button id="restart" type="button" disabled>처음부터 다시</button>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    MOL 티켓 해커톤 프로젝트 · 민첩한 하루 되세요!
+  </footer>
 
   <script>
-    // 5단계 난이도 구성
+    const ALL_PAYMENT_METHODS = ["card", "vbank", "kakaopay", "naverpay"];
+
+    // 더 미세해진 좌석 크기 (밀도 강화)
     const STAGES = [
       {
         name: "1단계: NUGU 그룹 팬미팅",
-        cols: 6,
-        rows: 5,
-        vanishInterval: 100, // 0.1초 간격
-        trapChance: 0.0
+        cols: 22,
+        rows: 16,         // 총 352석
+        vanishInterval: 30,
+        trapChance: 0.0,
+        hasAd: false
       },
       {
         name: "2단계: 어디서 들어본 그룹 콘서트",
-        cols: 8,
-        rows: 7,
-        vanishInterval: 45,  // 0.045초 간격
-        trapChance: 0.1
+        cols: 28,
+        rows: 20,         // 총 560석
+        vanishInterval: 16,
+        trapChance: 0.1,
+        hasAd: false
       },
       {
         name: "3단계: 듣보 중 1군 아이돌 콘서트",
-        cols: 10,
-        rows: 8,
-        vanishInterval: 22,  // 0.022초 간격
-        trapChance: 0.25
+        cols: 36,
+        rows: 25,         // 총 900석
+        vanishInterval: 9,
+        trapChance: 0.25,
+        hasAd: true
       },
       {
         name: "4단계: 1군 아이돌 콘서트",
-        cols: 11,
-        rows: 10,
-        vanishInterval: 12,  // 0.012초 간격
-        trapChance: 0.35
+        cols: 42,
+        rows: 30,         // 총 1,260석
+        vanishInterval: 4,
+        trapChance: 0.35,
+        hasAd: true
       },
       {
         name: "5단계: 슈퍼월드스타 콘서트",
-        cols: 13,
-        rows: 11,
-        vanishInterval: 6,   // 0.006초 극악의 소멸 속도
-        trapChance: 0.5
+        cols: 50,
+        rows: 35,         // 총 1,750석 (초극밀도)
+        vanishInterval: 2,
+        trapChance: 0.5,
+        hasAd: true
       }
     ];
 
@@ -205,6 +588,13 @@
     let vanishTimer = null;
     let isPlaying = false;
     let remainingGrapes = 0;
+    let selectedSeat = null;
+
+    let stageAllowedMethods = [];
+    let selectedPayMethod = null;
+
+    let payTimeoutTimer = null;
+    let payTimeLeft = 3.0;
 
     // DOM 요소
     const stageContainer = document.getElementById('stage');
@@ -213,6 +603,12 @@
     const overlay = document.getElementById('overlay');
     const overlayTitle = document.getElementById('overlay-title');
     const overlayDesc = document.getElementById('overlay-desc');
+    const adOverlay = document.getElementById('ad-overlay');
+    const adCloseBtn = document.getElementById('ad-close-btn');
+    const paymentOverlay = document.getElementById('payment-overlay');
+    const paymentActions = document.getElementById('payment-actions');
+    const payTimerText = document.getElementById('pay-timer-text');
+    const payMethodBtns = document.querySelectorAll('.pay-method-btn');
     const popAlert = document.getElementById('pop-alert');
     const startBtn = document.getElementById('start');
     const restartBtn = document.getElementById('restart');
@@ -228,13 +624,109 @@
       resetGame();
     });
 
+    // 광고 닫기 버튼 이벤트
+    adCloseBtn.addEventListener('click', () => {
+      adOverlay.style.display = "none";
+      isPlaying = true; // 광고 닫으면 게임 재개
+    });
+
+    payMethodBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+
+        payMethodBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        
+        selectedPayMethod = btn.dataset.method;
+        const confirmBtn = document.getElementById('pay-confirm-btn');
+        if (confirmBtn) confirmBtn.disabled = false;
+      });
+    });
+
+    // 스테이지별로 확인/취소 버튼 위치를 무작위 배치하는 함수
+    function setupPaymentButtons() {
+      paymentActions.innerHTML = '';
+
+      const confirmBtn = document.createElement('button');
+      confirmBtn.id = 'pay-confirm-btn';
+      confirmBtn.type = 'button';
+      confirmBtn.textContent = '확인';
+      confirmBtn.disabled = true;
+      confirmBtn.onclick = () => {
+        if (!selectedPayMethod) return;
+        clearInterval(payTimeoutTimer);
+        paymentOverlay.style.display = "none";
+        if (selectedSeat) {
+          selectedSeat.classList.remove('grape');
+          selectedSeat.classList.add('taken');
+        }
+        stageClear();
+      };
+
+      const cancelBtn = document.createElement('button');
+      cancelBtn.id = 'pay-cancel-btn';
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'btn-cancel';
+      cancelBtn.textContent = '취소';
+      cancelBtn.onclick = () => {
+        cancelPaymentAndResume();
+      };
+
+      // 무작위 순서 배치 (50% 확률로 좌/우 반전)
+      if (Math.random() < 0.5) {
+        paymentActions.appendChild(cancelBtn);
+        paymentActions.appendChild(confirmBtn);
+      } else {
+        paymentActions.appendChild(confirmBtn);
+        paymentActions.appendChild(cancelBtn);
+      }
+    }
+
+    function cancelPaymentAndResume() {
+      clearInterval(payTimeoutTimer);
+      paymentOverlay.style.display = "none";
+      if (selectedSeat) {
+        selectedSeat.classList.remove('grape');
+        selectedSeat.classList.add('taken');
+        remainingGrapes--;
+        timerLabel.textContent = `남은 포도알: ${remainingGrapes}개`;
+      }
+      showPopAlert();
+      isPlaying = true;
+    }
+
+    function startPaymentTimer() {
+      clearInterval(payTimeoutTimer);
+      payTimeLeft = 3.0;
+      payTimerText.textContent = `⏳ ${payTimeLeft.toFixed(1)}초`;
+
+      payTimeoutTimer = setInterval(() => {
+        payTimeLeft -= 0.1;
+        if (payTimeLeft <= 0) {
+          clearInterval(payTimeoutTimer);
+          cancelPaymentAndResume();
+        } else {
+          payTimerText.textContent = `⏳ ${payTimeLeft.toFixed(1)}초`;
+        }
+      }, 100);
+    }
+
+    function generateRandomPaymentMethods() {
+      const shuffled = [...ALL_PAYMENT_METHODS].sort(() => 0.5 - Math.random());
+      const count = Math.floor(Math.random() * 3) + 1;
+      return shuffled.slice(0, count);
+    }
+
     function resetGame() {
       clearInterval(vanishTimer);
+      clearInterval(payTimeoutTimer);
       isPlaying = false;
       startBtn.disabled = false;
       restartBtn.disabled = true;
       stageLabel.textContent = "대기 중";
       timerLabel.textContent = "남은 포도알: --개";
+      paymentOverlay.style.display = "none";
+      adOverlay.style.display = "none";
       overlay.style.display = "flex";
       overlayTitle.textContent = "민첩함 검증 준비";
       overlayDesc.textContent = "시작 버튼을 눌러 1단계 'NUGU 그룹 팬미팅' 티켓팅을 시작하세요.";
@@ -247,29 +739,54 @@
       const config = STAGES[index];
       stageLabel.textContent = config.name;
       overlay.style.display = "none";
-      isPlaying = true;
+      paymentOverlay.style.display = "none";
+      adOverlay.style.display = "none";
+      
+      // 결제 버튼 무작위 위치 세팅
+      setupPaymentButtons();
 
-      // 그리드 비율 구성
+      stageAllowedMethods = generateRandomPaymentMethods();
+
       stageContainer.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
       stageContainer.style.gridTemplateRows = `repeat(${config.rows}, 1fr)`;
 
-      // 기존 좌석 정리
       const seats = stageContainer.querySelectorAll('.seat');
       seats.forEach(seat => seat.remove());
 
       const totalSeats = config.cols * config.rows;
-      remainingGrapes = totalSeats;
+      
+      const initialGrapeCount = Math.floor(totalSeats / 2);
+      remainingGrapes = initialGrapeCount;
       timerLabel.textContent = `남은 포도알: ${remainingGrapes}개`;
 
-      // 처음 시작 시 모든 좌석을 포도알(grape) 상태로 채움
+      const grapeIndices = new Set();
+      while (grapeIndices.size < initialGrapeCount) {
+        const randomIndex = Math.floor(Math.random() * totalSeats);
+        grapeIndices.add(randomIndex);
+      }
+
       for (let i = 0; i < totalSeats; i++) {
         const seat = document.createElement('div');
-        seat.classList.add('seat', 'grape');
+        seat.classList.add('seat');
+        
+        if (grapeIndices.has(i)) {
+          seat.classList.add('grape');
+        } else {
+          seat.classList.add('taken');
+        }
+
         seat.addEventListener('click', () => handleSeatClick(seat, config));
         stageContainer.appendChild(seat);
       }
 
-      // 좌석 초고속 소멸 타이머 시작
+      // 스테이지 3 이상 광고 기습 등판 로직
+      if (config.hasAd) {
+        isPlaying = false; // 광고 닫기 전까지 정지
+        adOverlay.style.display = "flex";
+      } else {
+        isPlaying = true;
+      }
+
       clearInterval(vanishTimer);
       vanishTimer = setInterval(() => {
         if (!isPlaying) return;
@@ -277,7 +794,6 @@
       }, config.vanishInterval);
     }
 
-    // 무작위로 하나씩 포도알(보라색)을 검은색(팔린 좌석)으로 변환
     function vanishOneGrape() {
       const activeGrapes = Array.from(stageContainer.querySelectorAll('.seat.grape'));
       
@@ -299,7 +815,6 @@
       if (!isPlaying) return;
 
       if (seat.classList.contains('grape')) {
-        // 확률에 따른 '이선좌' 트릭 팝업
         if (Math.random() < config.trapChance) {
           showPopAlert();
           seat.classList.remove('grape');
@@ -309,9 +824,22 @@
           return;
         }
 
-        // 민첩하게 포도알 잡기 성공!
-        seat.classList.remove('grape');
-        stageClear();
+        isPlaying = false;
+        selectedSeat = seat;
+        
+        selectedPayMethod = null;
+
+        payMethodBtns.forEach(btn => {
+          btn.classList.remove('selected');
+          if (stageAllowedMethods.includes(btn.dataset.method)) {
+            btn.disabled = false;
+          } else {
+            btn.disabled = true;
+          }
+        });
+
+        paymentOverlay.style.display = "flex";
+        startPaymentTimer();
       }
     }
 
@@ -324,10 +852,10 @@
 
     function stageClear() {
       clearInterval(vanishTimer);
+      clearInterval(payTimeoutTimer);
       isPlaying = false;
 
       if (currentStageIndex + 1 < STAGES.length) {
-        // 다음 단계 진입
         currentStageIndex++;
         overlayTitle.textContent = "🎉 성공! 예매 완료";
         overlayDesc.textContent = `오늘도 민첩한 하루! 다음 단계 (${STAGES[currentStageIndex].name})에 도전하세요.`;
@@ -342,7 +870,6 @@
         };
         overlay.appendChild(nextBtn);
       } else {
-        // 5단계까지 완료했을 때 최종 우승
         overlayTitle.textContent = "🏆 모든 콘서트 정복!";
         overlayDesc.textContent = "당신은 대한민국 0.001%의 민첩성을 가졌습니다! 민첩한 하루 되세요!";
         overlay.style.display = "flex";
@@ -351,6 +878,7 @@
 
     function gameFail(reason) {
       clearInterval(vanishTimer);
+      clearInterval(payTimeoutTimer);
       isPlaying = false;
 
       overlayTitle.textContent = "😭 티켓팅 실패";
