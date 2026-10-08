@@ -450,7 +450,7 @@
       <div class="hero-text">
         <span class="badge">2026 단독 티켓팅</span>
         <h2>🍇 엄. 다음엔 민첩하세요.</h2>
-        <p> 포도알 줴줴이야! 포도알을 가져가~</p>
+        <p>포도알 줴줴이야! 포도알을 가져가~</p>
       </div>
     </div>
 
@@ -470,7 +470,7 @@
         <div class="game-title">🍇 아이돌 콘서트 좌석 예매 (포도알 잡기)</div>
       </div>
       <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">
-        사라지기 전 극소형 포도알을 누르고, 난립하는 방해 요소와 3초 제한 결제를 뚫어내세요!
+        광고창이 떠도 포도알 소멸 타이머는 멈추지 않습니다! 빠르게 광고를 닫고 좌석을 선점하세요!
       </p>
 
       <!-- 게임 상단 상태 표시 바 -->
@@ -481,7 +481,7 @@
 
       <!-- 게임 스테이지 영역 -->
       <section id="stage" aria-label="티켓팅 좌석 선택 화면" aria-live="polite">
-        <div id="pop-alert" class="pop-alert">엄. 아뇨아뇨.(이선좌)</div>
+        <div id="pop-alert" class="pop-alert">이미 선택된 좌석입니다! (이선좌)</div>
         
         <!-- 오버레이 안내창 -->
         <div id="overlay" class="stage-overlay">
@@ -493,9 +493,9 @@
         <div id="ad-overlay" class="stage-overlay" style="display: none; z-index: 15;">
           <div class="ad-card">
             <button id="ad-close-btn" class="ad-close-btn" type="button">✕</button>
-            <img src="image_b689bc.jpg" alt="광고">
+            <img src="image_b689bc.jpg" alt="해커톤 모집 광고">
             <p style="font-size: 12px; color: #dc2626; font-weight: bold; margin-top: 8px;">
-              ⚠️ 기습 광고 발생! 닫기 버튼을 민첩하게 누르세요!
+              ⚠️ 기습 광고 발생! 타이머가 흐르고 있습니다!
             </p>
           </div>
         </div>
@@ -518,7 +518,6 @@
               <button type="button" class="pay-method-btn" data-method="naverpay">네이버페이</button>
             </div>
 
-            <!-- 스테이지별로 순서가 위치가 바뀌는 결제 버튼 영역 -->
             <div id="payment-actions" class="payment-actions">
               <!-- JS에서 버튼 위치를 무작위로 교체 생성 -->
             </div>
@@ -540,12 +539,11 @@
   <script>
     const ALL_PAYMENT_METHODS = ["card", "vbank", "kakaopay", "naverpay"];
 
-    // 더 미세해진 좌석 크기 (밀도 강화)
     const STAGES = [
       {
         name: "1단계: NUGU 그룹 팬미팅",
         cols: 22,
-        rows: 16,         // 총 352석
+        rows: 16,
         vanishInterval: 30,
         trapChance: 0.0,
         hasAd: false
@@ -553,7 +551,7 @@
       {
         name: "2단계: 어디서 들어본 그룹 콘서트",
         cols: 28,
-        rows: 20,         // 총 560석
+        rows: 20,
         vanishInterval: 16,
         trapChance: 0.1,
         hasAd: false
@@ -561,7 +559,7 @@
       {
         name: "3단계: 듣보 중 1군 아이돌 콘서트",
         cols: 36,
-        rows: 25,         // 총 900석
+        rows: 25,
         vanishInterval: 9,
         trapChance: 0.25,
         hasAd: true
@@ -569,7 +567,7 @@
       {
         name: "4단계: 1군 아이돌 콘서트",
         cols: 42,
-        rows: 30,         // 총 1,260석
+        rows: 30,
         vanishInterval: 4,
         trapChance: 0.35,
         hasAd: true
@@ -577,7 +575,7 @@
       {
         name: "5단계: 슈퍼월드스타 콘서트",
         cols: 50,
-        rows: 35,         // 총 1,750석 (초극밀도)
+        rows: 35,
         vanishInterval: 2,
         trapChance: 0.5,
         hasAd: true
@@ -627,7 +625,6 @@
     // 광고 닫기 버튼 이벤트
     adCloseBtn.addEventListener('click', () => {
       adOverlay.style.display = "none";
-      isPlaying = true; // 광고 닫으면 게임 재개
     });
 
     payMethodBtns.forEach(btn => {
@@ -643,7 +640,6 @@
       });
     });
 
-    // 스테이지별로 확인/취소 버튼 위치를 무작위 배치하는 함수
     function setupPaymentButtons() {
       paymentActions.innerHTML = '';
 
@@ -672,7 +668,6 @@
         cancelPaymentAndResume();
       };
 
-      // 무작위 순서 배치 (50% 확률로 좌/우 반전)
       if (Math.random() < 0.5) {
         paymentActions.appendChild(cancelBtn);
         paymentActions.appendChild(confirmBtn);
@@ -742,9 +737,10 @@
       paymentOverlay.style.display = "none";
       adOverlay.style.display = "none";
       
-      // 결제 버튼 무작위 위치 세팅
-      setupPaymentButtons();
+      // 타이머 및 게임 동작 활성화
+      isPlaying = true;
 
+      setupPaymentButtons();
       stageAllowedMethods = generateRandomPaymentMethods();
 
       stageContainer.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
@@ -779,14 +775,12 @@
         stageContainer.appendChild(seat);
       }
 
-      // 스테이지 3 이상 광고 기습 등판 로직
+      // 스테이지 3 이상일 경우 광고를 띄움 (단, isPlaying은 true 상태로 유지하여 타이머가 계속 흐름)
       if (config.hasAd) {
-        isPlaying = false; // 광고 닫기 전까지 정지
         adOverlay.style.display = "flex";
-      } else {
-        isPlaying = true;
       }
 
+      // 포도알 소멸 루프 타이머 시작
       clearInterval(vanishTimer);
       vanishTimer = setInterval(() => {
         if (!isPlaying) return;
@@ -812,7 +806,8 @@
     }
 
     function handleSeatClick(seat, config) {
-      if (!isPlaying) return;
+      // 광고창이 열려있는 동안에는 클릭 불가
+      if (!isPlaying || adOverlay.style.display === "flex") return;
 
       if (seat.classList.contains('grape')) {
         if (Math.random() < config.trapChance) {
@@ -824,7 +819,7 @@
           return;
         }
 
-        isPlaying = false;
+        isPlaying = false; // 결제 진행 중에는 타이머 멈춤
         selectedSeat = seat;
         
         selectedPayMethod = null;
@@ -871,7 +866,7 @@
         overlay.appendChild(nextBtn);
       } else {
         overlayTitle.textContent = "🏆 모든 콘서트 정복!";
-        overlayDesc.textContent = "내일도 민첩한 하루가 될까요?";
+        overlayDesc.textContent = "당신은 대한민국 0.001%의 민첩성을 가졌습니다! 민첩한 하루 되세요!";
         overlay.style.display = "flex";
       }
     }
