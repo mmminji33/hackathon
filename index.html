@@ -3,74 +3,361 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KING 해커톤 · 배포 확인</title>
+  <title>민첩한 하루 되세요 · 포도알 잡기 티켓팅 게임</title>
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #eef1eb; color: #17241c; font-family: system-ui, "Malgun Gothic", sans-serif; }
-    main { width: min(100%, 720px); padding: clamp(24px, 5vw, 48px); border: 1px solid #00462a; border-radius: 8px; background: white; }
-    .label { margin: 0 0 24px; color: #00462a; font-size: 14px; font-weight: 700; }
-    h1 { margin: 0 0 16px; font-size: clamp(28px, 6vw, 42px); }
-    p { line-height: 1.7; }
-    #stage { display: grid; place-items: center; min-height: 180px; margin: 28px 0 20px; padding: 24px; background: #f3f5f1; border: 1px solid #d8ded7; text-align: center; }
-    #message { margin: 0; }
+    body { 
+      margin: 0; 
+      min-height: 100vh; 
+      display: grid; 
+      place-items: center; 
+      padding: 24px; 
+      background: #eef1eb; 
+      color: #17241c; 
+      font-family: system-ui, "Malgun Gothic", sans-serif; 
+    }
+    main { 
+      width: min(100%, 720px); 
+      padding: clamp(20px, 4vw, 36px); 
+      border: 1px solid #00462a; 
+      border-radius: 8px; 
+      background: white; 
+    }
+    .label { margin: 0 0 12px; color: #00462a; font-size: 14px; font-weight: 700; }
+    h1 { margin: 0 0 12px; font-size: clamp(24px, 5vw, 36px); }
+    p { line-height: 1.6; margin: 0 0 16px; }
+
+    /* 게임 상단 정보 바 */
+    .game-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f3f5f1;
+      padding: 12px 16px;
+      border: 1px solid #d8ded7;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      font-weight: bold;
+    }
+    .stage-name { color: #00462a; font-size: 16px; }
+    .timer { color: #d9534f; font-size: 18px; }
+
+    /* 게임 스테이지 관람석 (포도알 구역) */
+    #stage { 
+      position: relative;
+      display: grid; 
+      gap: 6px;
+      min-height: 320px; 
+      margin: 0 0 20px; 
+      padding: 16px; 
+      background: #1e1e1e; 
+      border: 2px solid #00462a; 
+      border-radius: 6px;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* 대기/완료 화면 안내 문구 */
+    .stage-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      z-content: 10;
+    }
+    .stage-overlay h2 { margin: 0 0 12px; color: #00462a; }
+
+    /* 좌석(포도알) 스타일 */
+    .seat {
+      background: #444;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.1s;
+    }
+    .seat.taken {
+      background: #222;
+      cursor: not-allowed;
+    }
+    /* 이선좌(보라색 포도알) */
+    .seat.grape {
+      background: #8a2be2;
+      box-shadow: 0 0 8px #a855f7;
+      animation: pulse 0.6s infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(0.95); }
+      to { transform: scale(1.05); }
+    }
+
+    /* 이선좌 팝업 경고 */
+    .pop-alert {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #ff4d4d;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 20;
+      display: none;
+    }
+
     .buttons { display: flex; flex-wrap: wrap; gap: 12px; }
-    button { padding: 12px 20px; border: 1px solid #00462a; border-radius: 4px; background: #00462a; color: white; font: inherit; cursor: pointer; }
+    button { 
+      padding: 12px 20px; 
+      border: 1px solid #00462a; 
+      border-radius: 4px; 
+      background: #00462a; 
+      color: white; 
+      font: inherit; 
+      font-weight: bold;
+      cursor: pointer; 
+    }
     #restart { background: white; color: #00462a; }
     button:disabled { opacity: .4; cursor: default; }
     button:focus-visible { outline: 3px solid #69a58c; outline-offset: 4px; }
-    .guide { margin-top: 28px; padding: 24px; border: 1px solid #d8ded7; background: #f8faf6; }
-    .guide h2 { margin: 0 0 12px; font-size: 22px; }
-    .guide li { margin: 10px 0; line-height: 1.7; }
-    .sheet-link { display: inline-block; margin-top: 8px; padding: 12px 18px; background: #00462a; color: white; border-radius: 4px; text-decoration: none; }
-    .sheet-link:focus-visible { outline: 3px solid #69a58c; outline-offset: 4px; }
-    .note { margin-top: 28px; padding-top: 20px; border-top: 1px solid #d8ded7; color: #68746b; font-size: 14px; }
+
+    .note { margin-top: 24px; padding-top: 16px; border-top: 1px solid #d8ded7; color: #68746b; font-size: 14px; }
   </style>
 </head>
 <body>
   <main>
-    <p class="label">KING · 바이브코딩 해커톤</p>
-    <!-- 사전 수정 연습: 아래 제목을 원하는 문구로 바꿔 보세요. -->
-    <h1>해커톤 준비</h1>
-    <p>이 화면이 GitHub Pages 공개 주소에서 보이면 배포에 성공한 것입니다.<br>시작 버튼을 눌러 기본 동작도 확인해 주세요.</p>
-    <section id="stage" aria-label="실행 확인 화면" aria-live="polite">
-      <p id="message">시작 버튼을 눌러 주세요.</p>
-    </section>
-    <div class="buttons">
-      <button id="start" type="button">시작</button>
-      <button id="restart" type="button" disabled>다시 시작</button>
+    <p class="label">민첩한 하루 되세요 · 웹게임 프로젝트</p>
+    <h1>🍇 아이돌 콘서트 포도알 잡기</h1>
+    <p>사라지는 보라색 좌석(포도알)을 민첩하게 클릭하여 티켓팅에 성공하세요!</p>
+
+    <!-- 게임 상단 상태 표시 바 -->
+    <div class="game-status-bar">
+      <span id="stage-label" class="stage-name">대기 중</span>
+      <span id="timer-label" class="timer">남은 시간: --초</span>
     </div>
-    <section class="guide" aria-labelledby="guide-title">
-      <h2 id="guide-title">참가자 정보 사전 입력</h2>
-      <p>정기 모임 전에 GitHub와 Skeam 계정을 만들고, 아래 스프레드시트에 본인 정보를 미리 기재해 주세요.</p>
-      <ol>
-        <li><strong>GitHub 계정:</strong> 계정을 생성하고 이메일 인증을 완료합니다. 공개 저장소를 만들고 이 파일을 GitHub Pages에 배포해 봅니다.</li>
-        <li><strong>Skeam 계정:</strong> 계정을 생성하고 행사에 사용할 기기에서 로그인을 확인합니다.</li>
-        <li><strong>스프레드시트:</strong> 빈 행 하나에 이름, Skeam 닉네임, 참여 여부, 사용할 AI·제작 도구를 입력합니다. 이미 본인 행이 있다면 해당 행을 수정합니다.</li>
-        <li><strong>행사 후 입력:</strong> 작품명과 Skeam 링크를 입력합니다. 아직 만들지 않은 작품 정보와 링크는 비워 두어도 됩니다.</li>
-      </ol>
-      <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1eLqrOtpMhR3VfCOIV-9_RNtlB1wUtHm_m6aK4ziDUH8/edit?usp=sharing" target="_blank" rel="noopener noreferrer">참가자 정보 입력 시트 열기 ↗</a>
-      <p style="font-size:14px;color:#68746b">다른 참가자의 행은 수정하지 마세요. 비밀번호·API 키는 기재하지 않습니다. 사전 준비·출석·제출 상태·실행 확인은 운영진이 관리합니다.</p>
+
+    <!-- 게임 스테이지 영역 -->
+    <section id="stage" aria-label="티켓팅 좌석 선택 화면" aria-live="polite">
+      <div id="pop-alert" class="pop-alert">이미 선택된 좌석입니다! (이선좌)</div>
+      
+      <!-- 오버레이 안내창 -->
+      <div id="overlay" class="stage-overlay">
+        <h2 id="overlay-title">민첩함 검증 준비</h2>
+        <p id="overlay-desc">시작 버튼을 눌러 1단계 'NUGU 그룹 팬미팅' 티켓팅을 시작하세요.</p>
+      </div>
     </section>
-    <p class="note">이 파일은 배포 연습용 기본 틀입니다. 실제 게임 규칙과 조작은 당일 추가하세요.<br>사전 연습: 제목을 수정해 다시 올린 뒤 공개 페이지에도 반영되는지 확인합니다.</p>
+
+    <div class="buttons">
+      <button id="start" type="button">티켓팅 시작</button>
+      <button id="restart" type="button" disabled>처음부터 다시</button>
+    </div>
+
+    <p class="note">팁: 단계를 거칠수록 좌석 수가 많아지고 포도알이 빠르게 사라집니다!</p>
   </main>
+
   <script>
-    // 외부 라이브러리 없이 이 파일 하나로 실행됩니다.
-    const message = document.getElementById('message');
-    const start = document.getElementById('start');
-    const restart = document.getElementById('restart');
-    start.addEventListener('click', () => {
-      message.textContent = '시작 버튼이 정상적으로 작동합니다. 다시 시작 버튼도 확인해 주세요.';
-      start.disabled = true;
-      restart.disabled = false;
-      restart.focus();
+    // 스테이지 별 데이터 설정
+    const STAGES = [
+      {
+        name: "1단계: NUGU 그룹 팬미팅",
+        cols: 6,
+        rows: 5,
+        timeLimit: 10,
+        grapeDuration: 2500, // 포도알 유지 시간 (ms)
+        spawnInterval: 1200, // 포도알 생성 주기 (ms)
+        trapChance: 0.1      // 이선좌 팝업 트릭 확률
+      },
+      {
+        name: "2단계: 국내 1군 아이돌 콘서트",
+        cols: 9,
+        rows: 7,
+        timeLimit: 8,
+        grapeDuration: 1300,
+        spawnInterval: 800,
+        trapChance: 0.3
+      },
+      {
+        name: "3단계: 월드스타 아이돌 콘서트",
+        cols: 12,
+        rows: 9,
+        timeLimit: 6,
+        grapeDuration: 650,
+        spawnInterval: 400,
+        trapChance: 0.5
+      }
+    ];
+
+    let currentStageIndex = 0;
+    let timer = null;
+    let spawnTimer = null;
+    let timeLeft = 0;
+    let isPlaying = false;
+
+    // DOM 요소
+    const stageContainer = document.getElementById('stage');
+    const stageLabel = document.getElementById('stage-label');
+    const timerLabel = document.getElementById('timer-label');
+    const overlay = document.getElementById('overlay');
+    const overlayTitle = document.getElementById('overlay-title');
+    const overlayDesc = document.getElementById('overlay-desc');
+    const popAlert = document.getElementById('pop-alert');
+    const startBtn = document.getElementById('start');
+    const restartBtn = document.getElementById('restart');
+
+    startBtn.addEventListener('click', () => {
+      startBtn.disabled = true;
+      restartBtn.disabled = false;
+      currentStageIndex = 0;
+      loadStage(currentStageIndex);
     });
-    restart.addEventListener('click', () => {
-      message.textContent = '시작 버튼을 눌러 주세요.';
-      start.disabled = false;
-      restart.disabled = true;
-      start.focus();
+
+    restartBtn.addEventListener('click', () => {
+      resetGame();
     });
+
+    function resetGame() {
+      clearInterval(timer);
+      clearInterval(spawnTimer);
+      isPlaying = false;
+      startBtn.disabled = false;
+      restartBtn.disabled = true;
+      stageLabel.textContent = "대기 중";
+      timerLabel.textContent = "남은 시간: --초";
+      overlay.style.display = "flex";
+      overlayTitle.textContent = "민첩함 검증 준비";
+      overlayDesc.textContent = "시작 버튼을 눌러 1단계 'NUGU 그룹 팬미팅' 티켓팅을 시작하세요.";
+      
+      // 기존 좌석 삭제
+      const seats = stageContainer.querySelectorAll('.seat');
+      seats.forEach(seat => seat.remove());
+    }
+
+    function loadStage(index) {
+      const config = STAGES[index];
+      stageLabel.textContent = config.name;
+      overlay.style.display = "none";
+      isPlaying = true;
+
+      // 그리드 비율 구성
+      stageContainer.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
+      stageContainer.style.gridTemplateRows = `repeat(${config.rows}, 1fr)`;
+
+      // 좌석 판 생성
+      const seats = stageContainer.querySelectorAll('.seat');
+      seats.forEach(seat => seat.remove());
+      const totalSeats = config.cols * config.rows;
+
+      for (let i = 0; i < totalSeats; i++) {
+        const seat = document.createElement('div');
+        seat.classList.add('seat');
+        seat.addEventListener('click', () => handleSeatClick(seat, config));
+        stageContainer.appendChild(seat);
+      }
+
+      // 타이머 시작
+      timeLeft = config.timeLimit;
+      timerLabel.textContent = `남은 시간: ${timeLeft}초`;
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerLabel.textContent = `남은 시간: ${timeLeft}초`;
+        if (timeLeft <= 0) {
+          gameFail("시간 초과! 포도알을 잡지 못해 눈밭을 보았습니다...");
+        }
+      }, 1000);
+
+      // 포도알 생성 루프 시작
+      clearInterval(spawnTimer);
+      spawnGrape(config);
+      spawnTimer = setInterval(() => {
+        if (isPlaying) spawnGrape(config);
+      }, config.spawnInterval);
+    }
+
+    function spawnGrape(config) {
+      const seats = Array.from(stageContainer.querySelectorAll('.seat:not(.taken):not(.grape)'));
+      if (seats.length === 0) return;
+
+      // 무작위 좌석 선택 후 포도알 부여
+      const randomSeat = seats[Math.floor(Math.random() * seats.length)];
+      randomSeat.classList.add('grape');
+
+      // 일정 시간 후 포도알 소멸
+      setTimeout(() => {
+        if (randomSeat.classList.contains('grape')) {
+          randomSeat.classList.remove('grape');
+          randomSeat.classList.add('taken'); // 소멸 시 이미 팔린 좌석 처리
+        }
+      }, config.grapeDuration);
+    }
+
+    function handleSeatClick(seat, config) {
+      if (!isPlaying) return;
+
+      if (seat.classList.contains('grape')) {
+        // 이선좌 방해 팝업 확률 계산
+        if (Math.random() < config.trapChance) {
+          showPopAlert();
+          seat.classList.remove('grape');
+          seat.classList.add('taken');
+          return;
+        }
+
+        // 포도알 획득 성공
+        seat.classList.remove('grape');
+        stageClear();
+      }
+    }
+
+    function showPopAlert() {
+      popAlert.style.display = 'block';
+      setTimeout(() => {
+        popAlert.style.display = 'none';
+      }, 600);
+    }
+
+    function stageClear() {
+      clearInterval(timer);
+      clearInterval(spawnTimer);
+      isPlaying = false;
+
+      if (currentStageIndex + 1 < STAGES.length) {
+        // 다음 단계 진행
+        currentStageIndex++;
+        overlayTitle.textContent = "🎉 티켓팅 성공!";
+        overlayDesc.textContent = `민첩하시네요! 다음 단계 (${STAGES[currentStageIndex].name})를 도전하세요.`;
+        overlay.style.display = "flex";
+        
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = "다음 스테이지 도전";
+        nextBtn.style.marginTop = "16px";
+        nextBtn.onclick = () => {
+          nextBtn.remove();
+          loadStage(currentStageIndex);
+        };
+        overlay.appendChild(nextBtn);
+      } else {
+        // 최종 우승
+        overlayTitle.textContent = "🏆 월드스타 콘서트 1열 정복!";
+        overlayDesc.textContent = "당신은 최고의 민첩함을 가진 신의 손가락입니다! 민첩한 하루 되세요!";
+        overlay.style.display = "flex";
+      }
+    }
+
+    function gameFail(reason) {
+      clearInterval(timer);
+      clearInterval(spawnTimer);
+      isPlaying = false;
+
+      overlayTitle.textContent = "😭 티켓팅 실패";
+      overlayDesc.textContent = reason;
+      overlay.style.display = "flex";
+    }
   </script>
 </body>
 </html>
-
