@@ -46,8 +46,8 @@
     #stage { 
       position: relative;
       display: grid; 
-      gap: 6px;
-      min-height: 320px; 
+      gap: 5px;
+      min-height: 350px; 
       margin: 0 0 20px; 
       padding: 16px; 
       background: #1e1e1e; 
@@ -68,30 +68,32 @@
       align-items: center;
       padding: 20px;
       text-align: center;
-      z-content: 10;
+      z-index: 10;
     }
     .stage-overlay h2 { margin: 0 0 12px; color: #00462a; }
 
-    /* 좌석(포도알) 스타일 */
+    /* 좌석(포도알) 기본 스타일 */
     .seat {
-      background: #444;
-      border-radius: 4px;
+      border-radius: 3px;
       cursor: pointer;
-      transition: background-color 0.1s;
+      transition: background-color 0.05s, transform 0.05s;
     }
-    .seat.taken {
-      background: #222;
-      cursor: not-allowed;
-    }
-    /* 이선좌(보라색 포도알) */
+
+    /* 포도알 (보라색 선택 가능 좌석) */
     .seat.grape {
       background: #8a2be2;
-      box-shadow: 0 0 8px #a855f7;
-      animation: pulse 0.6s infinite alternate;
+      box-shadow: 0 0 5px #a855f7;
     }
-    @keyframes pulse {
-      from { transform: scale(0.95); }
-      to { transform: scale(1.05); }
+    .seat.grape:hover {
+      transform: scale(1.1);
+      background: #9d4edd;
+    }
+
+    /* 팔린 좌석 (검은색 선택 불가) */
+    .seat.taken {
+      background: #2b2b2b;
+      cursor: not-allowed;
+      box-shadow: none;
     }
 
     /* 이선좌 팝업 경고 */
@@ -132,12 +134,12 @@
   <main>
     <p class="label">민첩한 하루 되세요 · 웹게임 프로젝트</p>
     <h1>🍇 아이돌 콘서트 포도알 잡기</h1>
-    <p>사라지는 보라색 좌석(포도알)을 민첩하게 클릭하여 티켓팅에 성공하세요!</p>
+    <p>시작 즉시 모든 좌석이 풀립니다! 사라지기 전 보라색 포도알 하나를 민첩하게 누르세요!</p>
 
     <!-- 게임 상단 상태 표시 바 -->
     <div class="game-status-bar">
       <span id="stage-label" class="stage-name">대기 중</span>
-      <span id="timer-label" class="timer">남은 시간: --초</span>
+      <span id="timer-label" class="timer">남은 포도알: --개</span>
     </div>
 
     <!-- 게임 스테이지 영역 -->
@@ -156,46 +158,53 @@
       <button id="restart" type="button" disabled>처음부터 다시</button>
     </div>
 
-    <p class="note">팁: 단계를 거칠수록 좌석 수가 많아지고 포도알이 빠르게 사라집니다!</p>
+    <p class="note">경고: 5단계 '슈퍼월드스타 콘서트'까지 민첩함을 유지해야 완료할 수 있습니다!</p>
   </main>
 
   <script>
-    // 스테이지 별 데이터 설정
+    // 5단계 난이도 구성
     const STAGES = [
       {
         name: "1단계: NUGU 그룹 팬미팅",
         cols: 6,
         rows: 5,
-        timeLimit: 10,
-        grapeDuration: 2500, // 포도알 유지 시간 (ms)
-        spawnInterval: 1200, // 포도알 생성 주기 (ms)
-        trapChance: 0.1      // 이선좌 팝업 트릭 확률
+        vanishInterval: 100, // 0.1초 간격
+        trapChance: 0.0
       },
       {
-        name: "2단계: 국내 1군 아이돌 콘서트",
-        cols: 9,
+        name: "2단계: 어디서 들어본 그룹 콘서트",
+        cols: 8,
         rows: 7,
-        timeLimit: 8,
-        grapeDuration: 1300,
-        spawnInterval: 800,
-        trapChance: 0.3
+        vanishInterval: 45,  // 0.045초 간격
+        trapChance: 0.1
       },
       {
-        name: "3단계: 월드스타 아이돌 콘서트",
-        cols: 12,
-        rows: 9,
-        timeLimit: 6,
-        grapeDuration: 650,
-        spawnInterval: 400,
+        name: "3단계: 듣보 중 1군 아이돌 콘서트",
+        cols: 10,
+        rows: 8,
+        vanishInterval: 22,  // 0.022초 간격
+        trapChance: 0.25
+      },
+      {
+        name: "4단계: 1군 아이돌 콘서트",
+        cols: 11,
+        rows: 10,
+        vanishInterval: 12,  // 0.012초 간격
+        trapChance: 0.35
+      },
+      {
+        name: "5단계: 슈퍼월드스타 콘서트",
+        cols: 13,
+        rows: 11,
+        vanishInterval: 6,   // 0.006초 극악의 소멸 속도
         trapChance: 0.5
       }
     ];
 
     let currentStageIndex = 0;
-    let timer = null;
-    let spawnTimer = null;
-    let timeLeft = 0;
+    let vanishTimer = null;
     let isPlaying = false;
+    let remainingGrapes = 0;
 
     // DOM 요소
     const stageContainer = document.getElementById('stage');
@@ -220,18 +229,16 @@
     });
 
     function resetGame() {
-      clearInterval(timer);
-      clearInterval(spawnTimer);
+      clearInterval(vanishTimer);
       isPlaying = false;
       startBtn.disabled = false;
       restartBtn.disabled = true;
       stageLabel.textContent = "대기 중";
-      timerLabel.textContent = "남은 시간: --초";
+      timerLabel.textContent = "남은 포도알: --개";
       overlay.style.display = "flex";
       overlayTitle.textContent = "민첩함 검증 준비";
       overlayDesc.textContent = "시작 버튼을 눌러 1단계 'NUGU 그룹 팬미팅' 티켓팅을 시작하세요.";
       
-      // 기존 좌석 삭제
       const seats = stageContainer.querySelectorAll('.seat');
       seats.forEach(seat => seat.remove());
     }
@@ -246,69 +253,63 @@
       stageContainer.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
       stageContainer.style.gridTemplateRows = `repeat(${config.rows}, 1fr)`;
 
-      // 좌석 판 생성
+      // 기존 좌석 정리
       const seats = stageContainer.querySelectorAll('.seat');
       seats.forEach(seat => seat.remove());
-      const totalSeats = config.cols * config.rows;
 
+      const totalSeats = config.cols * config.rows;
+      remainingGrapes = totalSeats;
+      timerLabel.textContent = `남은 포도알: ${remainingGrapes}개`;
+
+      // 처음 시작 시 모든 좌석을 포도알(grape) 상태로 채움
       for (let i = 0; i < totalSeats; i++) {
         const seat = document.createElement('div');
-        seat.classList.add('seat');
+        seat.classList.add('seat', 'grape');
         seat.addEventListener('click', () => handleSeatClick(seat, config));
         stageContainer.appendChild(seat);
       }
 
-      // 타이머 시작
-      timeLeft = config.timeLimit;
-      timerLabel.textContent = `남은 시간: ${timeLeft}초`;
-
-      clearInterval(timer);
-      timer = setInterval(() => {
-        timeLeft--;
-        timerLabel.textContent = `남은 시간: ${timeLeft}초`;
-        if (timeLeft <= 0) {
-          gameFail("시간 초과! 포도알을 잡지 못해 눈밭을 보았습니다...");
-        }
-      }, 1000);
-
-      // 포도알 생성 루프 시작
-      clearInterval(spawnTimer);
-      spawnGrape(config);
-      spawnTimer = setInterval(() => {
-        if (isPlaying) spawnGrape(config);
-      }, config.spawnInterval);
+      // 좌석 초고속 소멸 타이머 시작
+      clearInterval(vanishTimer);
+      vanishTimer = setInterval(() => {
+        if (!isPlaying) return;
+        vanishOneGrape();
+      }, config.vanishInterval);
     }
 
-    function spawnGrape(config) {
-      const seats = Array.from(stageContainer.querySelectorAll('.seat:not(.taken):not(.grape)'));
-      if (seats.length === 0) return;
+    // 무작위로 하나씩 포도알(보라색)을 검은색(팔린 좌석)으로 변환
+    function vanishOneGrape() {
+      const activeGrapes = Array.from(stageContainer.querySelectorAll('.seat.grape'));
+      
+      if (activeGrapes.length === 0) {
+        clearInterval(vanishTimer);
+        gameFail("모든 포도알이 전부 증발했습니다... 민첩하지 못하시네요..");
+        return;
+      }
 
-      // 무작위 좌석 선택 후 포도알 부여
-      const randomSeat = seats[Math.floor(Math.random() * seats.length)];
-      randomSeat.classList.add('grape');
-
-      // 일정 시간 후 포도알 소멸
-      setTimeout(() => {
-        if (randomSeat.classList.contains('grape')) {
-          randomSeat.classList.remove('grape');
-          randomSeat.classList.add('taken'); // 소멸 시 이미 팔린 좌석 처리
-        }
-      }, config.grapeDuration);
+      const randomSeat = activeGrapes[Math.floor(Math.random() * activeGrapes.length)];
+      randomSeat.classList.remove('grape');
+      randomSeat.classList.add('taken');
+      
+      remainingGrapes--;
+      timerLabel.textContent = `남은 포도알: ${remainingGrapes}개`;
     }
 
     function handleSeatClick(seat, config) {
       if (!isPlaying) return;
 
       if (seat.classList.contains('grape')) {
-        // 이선좌 방해 팝업 확률 계산
+        // 확률에 따른 '이선좌' 트릭 팝업
         if (Math.random() < config.trapChance) {
           showPopAlert();
           seat.classList.remove('grape');
           seat.classList.add('taken');
+          remainingGrapes--;
+          timerLabel.textContent = `남은 포도알: ${remainingGrapes}개`;
           return;
         }
 
-        // 포도알 획득 성공
+        // 민첩하게 포도알 잡기 성공!
         seat.classList.remove('grape');
         stageClear();
       }
@@ -318,19 +319,18 @@
       popAlert.style.display = 'block';
       setTimeout(() => {
         popAlert.style.display = 'none';
-      }, 600);
+      }, 350);
     }
 
     function stageClear() {
-      clearInterval(timer);
-      clearInterval(spawnTimer);
+      clearInterval(vanishTimer);
       isPlaying = false;
 
       if (currentStageIndex + 1 < STAGES.length) {
-        // 다음 단계 진행
+        // 다음 단계 진입
         currentStageIndex++;
-        overlayTitle.textContent = "🎉 티켓팅 성공!";
-        overlayDesc.textContent = `민첩하시네요! 다음 단계 (${STAGES[currentStageIndex].name})를 도전하세요.`;
+        overlayTitle.textContent = "🎉 성공! 예매 완료";
+        overlayDesc.textContent = `오늘도 민첩한 하루! 다음 단계 (${STAGES[currentStageIndex].name})에 도전하세요.`;
         overlay.style.display = "flex";
         
         const nextBtn = document.createElement('button');
@@ -342,20 +342,19 @@
         };
         overlay.appendChild(nextBtn);
       } else {
-        // 최종 우승
-        overlayTitle.textContent = "🏆 월드스타 콘서트 1열 정복!";
-        overlayDesc.textContent = "당신은 최고의 민첩함을 가진 신의 손가락입니다! 민첩한 하루 되세요!";
+        // 5단계까지 완료했을 때 최종 우승
+        overlayTitle.textContent = "🏆 모든 콘서트 정복!";
+        overlayDesc.textContent = "당신은 대한민국 0.001%의 민첩성을 가졌습니다! 민첩한 하루 되세요!";
         overlay.style.display = "flex";
       }
     }
 
     function gameFail(reason) {
-      clearInterval(timer);
-      clearInterval(spawnTimer);
+      clearInterval(vanishTimer);
       isPlaying = false;
 
       overlayTitle.textContent = "😭 티켓팅 실패";
-      overlayDesc.textContent = reason;
+      overlayDesc.textContent = "엄. 다음엔 민첩한 하루 되세요 ㅋ";
       overlay.style.display = "flex";
     }
   </script>
